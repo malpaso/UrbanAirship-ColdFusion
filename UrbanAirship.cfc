@@ -55,7 +55,7 @@ component name="UrbanAirship" output="false" accessors="true" hint="A ColdFusion
 
   }
 
-  public any function create_tags(required string tag){
+  public any function create_tag(required string tag){
 
     var service = createHTTPService("PUT");
 
@@ -65,7 +65,7 @@ component name="UrbanAirship" output="false" accessors="true" hint="A ColdFusion
 
   }
 
-  public any function delete_tags(required string tag){
+  public any function delete_tag(required string tag){
 
     var service = createHTTPService("DELETE");
 
