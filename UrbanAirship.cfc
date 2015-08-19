@@ -77,11 +77,16 @@ component name="UrbanAirship" output="false" accessors="true" hint="A ColdFusion
 
   // DEVICES
 
-  public any function list_device_tokens(){
+  public any function list_device_tokens(numeric limit=1000,string start=""){
 
     var service = createHTTPService("GET");
+    var _start = "";
 
-    service.setUrl( getEndPoint() & '/device_tokens');
+    if( len(arguments.start) ){
+      _start = "&start=#arguments.start#";
+    }
+
+    service.setUrl( getEndPoint() & '/device_tokens/?limit=#arguments.limit##_start#');
 
     return call(service);
 
@@ -286,7 +291,7 @@ component name="UrbanAirship" output="false" accessors="true" hint="A ColdFusion
     }
 
     if ( val(listFirst(result.statusCode, " ")) gte 300 ){
-      throw(type=getService(),errorcode="#listFirst(result.statusCode, ' ')#", message="#result.statusCode#" detail="#result.fileContent.toString()#");
+      throw(type=getService(), errorcode="#listFirst(result.statusCode, ' ')#", message="#result.statusCode#", detail="#result.fileContent.toString()#");
     }
 
     return createObject("component","UrbanAirshipResponse").init( result );
@@ -298,9 +303,11 @@ component name="UrbanAirship" output="false" accessors="true" hint="A ColdFusion
     service.setMethod(arguments.urlmethod);
     service.setCharset('utf-8');
     service.setTimeout(arguments.httptimeout);
+    service.setUsername(#getApiKey()#);
+    service.setPassword(#getApiSecret()#);
     service.addParam(type="header",name="Accept",value="application/vnd.urbanairship+json; version=3;");
     service.addParam(type="header",name="Content-Type",value="application/json");
-    service.addParam(type="header",name="Authorization",value="Basic #getApiKey()#:#getApiSecret()#");
+    // service.addParam(type="header",name="Authorization",value="Basic #getApiKey()#:#getApiSecret()#");
 
     return service;
   }
@@ -352,11 +359,11 @@ component name="UrbanAirship" output="false" accessors="true" hint="A ColdFusion
 
   private void function validateSettings(required struct settings){
 
-    if( !struckKeyExists(arguments.settings,"apiKey") ){
+    if( !structKeyExists(arguments.settings,"apiKey") ){
       throw(type="error", file="#getService()#", message="[apiKey] not provided", detail="Settings: #toString(serializeJSON(arguments.settings))#");
     }
 
-    if( !struckKeyExists(arguments.settings,"apiSecret") ){
+    if( !structKeyExists(arguments.settings,"apiSecret") ){
       throw(type="error", file="#getService()#", message="[apiSecret] not provided", detail="Settings: #toString(serializeJSON(arguments.settings))#");
     }
 
